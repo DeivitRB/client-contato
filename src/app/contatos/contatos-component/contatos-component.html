@@ -1,6 +1,12 @@
 <div class="container-fluid mt-1">
-  <div style="padding: 8px 20px 8px 20px">
-    <span class="text-secondary">GERENCIAR CONTATOS</span>
+  <div style="padding: 8px 20px 8px 20px" class="row">
+    <div class="col-md-6">
+      <span class="text-secondary">GERENCIAR CONTATOS</span>
+    </div>
+    <div class="col-md-6 d-flex justify-content-end">
+      <span class="span-user"> <fa-icon [icon]="faUser" size="sm"></fa-icon> {{nomeUser}}</span>
+      <span class="span-sair" (click)="fnDeslogar()"> <fa-icon [icon]="faDoorOpen"></fa-icon> </span>
+    </div>
   </div>
   <div class="header-page">
     <div class="row">
@@ -165,9 +171,12 @@
                   (click)="fnGetDadosContato(item)"
                   data-bs-toggle="modal"
                   data-bs-target="#modalContatosEGrupo"
+                  title="Ver contato: {{item.ds_contato}}"
                 >
                   <fa-icon [icon]="faList" size="sm"></fa-icon>
                 </button>
+
+               
               </td>
             </tr>
             <tr *ngIf="listContatos.lenght <= 0">
@@ -265,8 +274,15 @@
             </div>
           </div>
 
-          <div class="div-total-grupos" *ngIf="validMenuContatoGrupo">
+          <div class="div-total-grupos mt-3" *ngIf="validMenuContatoGrupo">
             <div class="div-limit-grupos">
+
+              <div class="input-group mt-1">
+                <input formControlName="iptBuscaGrupos" type="text" class="form-control form-control-sm" placeholder="Buscar grupo por nome" aria-label="Buscar grupo por nome" aria-describedby="button-addon2">
+                <button class="btn btn-sm btn-outline-primary" type="button" id="button-addon2" (click)="fnFiltraListaGrupos()">Buscar</button>
+              </div>
+
+
               <div *ngFor="let item of listGrupos; let i = index">
                 <div
                   *ngIf="item.showGrupo == true"
@@ -306,6 +322,13 @@
               </button>
             </div>
             <div class="div-limit-grupos">
+
+              <div class="input-group mt-1">
+                <input formControlName="iptBuscaGruposContatos" type="text" class="form-control form-control-sm" placeholder="Buscar grupo por nome" aria-label="Buscar grupo por nome" aria-describedby="buscaGrupo">
+                <button class="btn btn-sm btn-outline-primary" type="button" id="buscaGrupo" (click)="fnFiltraListaGruposContato()">Buscar</button>
+              </div>
+
+
               <div
                 *ngFor="let item of listGruposContato; let i = index"
                 class="grupos"

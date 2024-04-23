@@ -10,12 +10,17 @@ import {
   faChevronLeft,
   faChevronRight,
   faList,
+  faUser,
+  faDoorOpen,
+  faTrashAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { ContatosService } from '../contatos.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { filtroContatos } from '../interfaces';
 import Swal from 'sweetalert2';
 import * as bootstrap from 'bootstrap';
+import { acessoService } from 'src/app/acesso/acesso.service';
+import { Observable } from 'rxjs';
 
 @Component({
   templateUrl: './contatos-component.html',
@@ -32,6 +37,9 @@ export class contatosComponent implements OnInit {
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
   faList = faList;
+  faUser = faUser;
+  faDoorOpen = faDoorOpen;
+  faTrashAlt = faTrashAlt;
 
   formFilter: FormGroup;
   formContatoGrupos: FormGroup;
@@ -76,8 +84,21 @@ export class contatosComponent implements OnInit {
   listGruposContato: any = [];
   listGrupoContatoDeletado: any = [];
   loadingInlineSalvar: boolean = false;
+  listFiltroGrupo: any = []
+  listFiltroGrupoContato: any = []
 
-  constructor(private contatosServ: ContatosService, private fb: FormBuilder) {}
+  showModal: Observable<boolean>;
+  nomeUser: string = ''
+
+  constructor(private contatosServ: ContatosService, private fb: FormBuilder, private acessoServ: acessoService) {
+    this.showModal = this.acessoServ.getNomeacesso()
+    
+    this.showModal.subscribe((resp: any) => {
+      if(resp != null) {
+          this.nomeUser = resp
+      }
+    })
+  }
 
   ngOnInit() {
     this.fnInitForm();
@@ -97,7 +118,13 @@ export class contatosComponent implements OnInit {
       iptCelularContato: ['', Validators.required],
       checkStatusContato: [true],
       idContato: [0],
+      iptBuscaGrupos: [''],
+      iptBuscaGruposContatos: ['']
     });
+  }
+
+  fnDeslogar() {
+    this.acessoServ.fnLogout()
   }
 
   async fnGetGrupos() {
@@ -106,7 +133,8 @@ export class contatosComponent implements OnInit {
       this.listGrupos.map((el: any) => {
         el.showGrupo = true;
       });
-      console.log(resp);
+
+      this.listFiltroGrupo = this.listGrupos
     });
   }
 
@@ -159,6 +187,7 @@ export class contatosComponent implements OnInit {
 
   fnResetFormContato() {
     this.listGruposContato = [];
+    this.listFiltroGrupoContato = []
     this.validMenuContatoGrupo = false;
     this.formContatoGrupos.patchValue({
       iptNomeContato: '',
@@ -197,6 +226,8 @@ export class contatosComponent implements OnInit {
       (resp: any) => {
         this.listGruposContato = resp[0];
 
+        this.listFiltroGrupoContato = this.listGruposContato
+
         if (this.listGruposContato.length > 0) {
           this.listGruposContato.filter((fi: any) => {
             this.listGrupos.map((fiG: any) => {
@@ -222,6 +253,7 @@ export class contatosComponent implements OnInit {
       ds_grupocontato: itemGrupo.dsGrupocontato,
     };
     this.listGruposContato.push(objGrupoContato);
+    this.listFiltroGrupoContato = this.listGruposContato
 
     this.listGrupos[i].showGrupo = false;
   }
@@ -237,6 +269,7 @@ export class contatosComponent implements OnInit {
           ds_grupocontato: el.dsGrupocontato,
         };
         this.listGruposContato.push(objGrupoContato);
+        this.listFiltroGrupoContato = this.listGruposContato
       }
     });
   }
@@ -253,6 +286,7 @@ export class contatosComponent implements OnInit {
     });
 
     this.listGruposContato = [];
+    this.listFiltroGrupoContato = this.listGruposContato
   }
 
   fnRetirarGrupodeContato(itemGrupo: any, i: number) {
@@ -267,6 +301,7 @@ export class contatosComponent implements OnInit {
     }
 
     this.listGruposContato.splice(i, 1);
+    this.listFiltroGrupoContato = this.listGruposContato
   }
 
   async fnSalvaContato() {
@@ -294,10 +329,17 @@ export class contatosComponent implements OnInit {
     if (idContato == 0) {
       (await this.contatosServ.fnInsertContato(objContato)).subscribe(
         (resp: any) => {
+
+          if(resp.valid != undefined) {
+            Swal.fire('Verifique!', 'Contato já cadastrado para esse email e celular.', 'warning');
+            this.loadingInlineSalvar = false;
+            return
+          }
+
           if (this.listGruposContato.length > 0) {
             this.fnSalvaGrupoContato(resp.id);
           }
-
+          
           this.loadingInlineSalvar = false;
           Swal.fire(
             'Sucesso!',
@@ -366,5 +408,40 @@ export class contatosComponent implements OnInit {
         (resp: any) => {}
       );
     });
+  }
+
+  fnFiltraListaGrupos() {
+    let iptBusca = this.formContatoGrupos.get('iptBuscaGrupos').value.toUpperCase()
+
+    const temp = this.listFiltroGrupo.filter(function (d: any) {
+      let resultNome = d.dsGrupocontato.toUpperCase().indexOf(iptBusca) !== -1 || !iptBusca;
+
+      if (resultNome != false) {
+        return resultNome;
+      }
+
+      return;
+    });
+
+    this.listGrupos = temp;
+
+  }
+
+  fnFiltraListaGruposContato() {
+
+    let iptBusca = this.formContatoGrupos.get('iptBuscaGruposContatos').value.toUpperCase()
+
+    const temp = this.listFiltroGrupoContato.filter(function (d: any) {
+      let resultNome = d.ds_grupocontato.toUpperCase().indexOf(iptBusca) !== -1 || !iptBusca;
+
+      if (resultNome != false) {
+        return resultNome;
+      }
+
+      return;
+    });
+
+    this.listGruposContato = temp;
+
   }
 }

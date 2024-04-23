@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ContatosModule } from './contatos/contatos.module';
 import { LoadingInlineModule } from './loading-inline/loading-inline.module';
+import { AcessoModule } from './acesso/acesso.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,7 +23,8 @@ import { LoadingInlineModule } from './loading-inline/loading-inline.module';
     FontAwesomeModule,
     NgbModule,
     ContatosModule,
-    LoadingInlineModule
+    LoadingInlineModule,
+    AcessoModule
   ],
   providers: [],
   bootstrap: [AppComponent],

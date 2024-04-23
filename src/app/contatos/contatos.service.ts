@@ -61,4 +61,8 @@ export class ContatosService {
   async fnDeletaContatoGrupo(idGrupo: number) {
     return await this.http.delete(this.URL + `/grupocontatos/${idGrupo}`);
   }
+
+  async fnDeletaContato(idContato: number) {
+    return await this.http.delete(this.URL + `/contatos/${idContato}`);
+  }
 }
