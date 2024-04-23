@@ -41,4 +41,24 @@ export class ContatosService {
   async fnGetGruposContato(id: number) {
     return await this.http.get<any>(this.URL + `/grupocontatos/${id}`);
   }
+
+  async fnInsertContato(obj: any) {
+    return await this.http.post(this.URL + `/contatos`, obj);
+  }
+
+  async fnEditarContato(obj: any, id: number) {
+    return await this.http.put(this.URL + `/contatos/${id}`, obj);
+  }
+
+  async fnInsertContatoGrupo(obj: any) {
+    return await this.http.post(this.URL + `/grupocontatos`, obj);
+  }
+
+  async fnEditaContatoGrupo(obj: any, idGrupo: number) {
+    return await this.http.put(this.URL + `/grupocontatos/${idGrupo}`, obj);
+  }
+
+  async fnDeletaContatoGrupo(idGrupo: number) {
+    return await this.http.delete(this.URL + `/grupocontatos/${idGrupo}`);
+  }
 }

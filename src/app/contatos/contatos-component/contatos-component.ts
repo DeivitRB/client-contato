@@ -9,11 +9,13 @@ import {
   faAnglesLeft,
   faChevronLeft,
   faChevronRight,
+  faList,
 } from '@fortawesome/free-solid-svg-icons';
 import { ContatosService } from '../contatos.service';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { filtroContatos } from '../interfaces';
 import Swal from 'sweetalert2';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   templateUrl: './contatos-component.html',
@@ -29,6 +31,7 @@ export class contatosComponent implements OnInit {
   faAnglesLeft = faAnglesLeft;
   faChevronLeft = faChevronLeft;
   faChevronRight = faChevronRight;
+  faList = faList;
 
   formFilter: FormGroup;
   formContatoGrupos: FormGroup;
@@ -71,6 +74,8 @@ export class contatosComponent implements OnInit {
   validMenuContatoGrupo: boolean = false;
   listGrupos: any = [];
   listGruposContato: any = [];
+  listGrupoContatoDeletado: any = [];
+  loadingInlineSalvar: boolean = false;
 
   constructor(private contatosServ: ContatosService, private fb: FormBuilder) {}
 
@@ -87,9 +92,9 @@ export class contatosComponent implements OnInit {
     });
 
     this.formContatoGrupos = this.fb.group({
-      iptNomeContato: [''],
-      iptEmailContato: [''],
-      iptCelularContato: [''],
+      iptNomeContato: ['', Validators.required],
+      iptEmailContato: ['', Validators.required],
+      iptCelularContato: ['', Validators.required],
       checkStatusContato: [true],
       idContato: [0],
     });
@@ -156,11 +161,11 @@ export class contatosComponent implements OnInit {
     this.listGruposContato = [];
     this.validMenuContatoGrupo = false;
     this.formContatoGrupos.patchValue({
-      iptNomeContato: [''],
-      iptEmailContato: [''],
-      iptCelularContato: [''],
-      checkStatusContato: [true],
-      idContato: [0],
+      iptNomeContato: '',
+      iptEmailContato: '',
+      iptCelularContato: '',
+      checkStatusContato: true,
+      idContato: 0,
     });
   }
 
@@ -222,7 +227,32 @@ export class contatosComponent implements OnInit {
   }
 
   fnInserirTodos() {
-    this.listGrupos.map((el: any) => {});
+    this.listGrupos.map((el: any) => {
+      if (el.stAtivo == 1) {
+        el.showGrupo = false;
+
+        let objGrupoContato = {
+          contato_id: 0,
+          grupocontato_id: el.id,
+          ds_grupocontato: el.dsGrupocontato,
+        };
+        this.listGruposContato.push(objGrupoContato);
+      }
+    });
+  }
+
+  fnRetirarTodosGrupos() {
+    this.listGrupos.filter((el: any) => {
+      el.showGrupo = true;
+    });
+
+    this.listGruposContato.filter((fi: any) => {
+      if (fi.id != undefined) {
+        this.listGrupoContatoDeletado.push(fi);
+      }
+    });
+
+    this.listGruposContato = [];
   }
 
   fnRetirarGrupodeContato(itemGrupo: any, i: number) {
@@ -232,6 +262,109 @@ export class contatosComponent implements OnInit {
       }
     });
 
+    if (itemGrupo.id != undefined) {
+      this.listGrupoContatoDeletado.push(itemGrupo);
+    }
+
     this.listGruposContato.splice(i, 1);
+  }
+
+  async fnSalvaContato() {
+    let objContato: any = {
+      dsContato: this.formContatoGrupos.get('iptNomeContato').value,
+      nrCelular: this.formContatoGrupos.get('iptCelularContato').value,
+      dsEmail: this.formContatoGrupos.get('iptEmailContato').value,
+      stAtivo:
+        this.formContatoGrupos.get('checkStatusContato').value == true ? 1 : 0,
+    };
+
+    let idContato = Number(this.formContatoGrupos.get('idContato').value);
+
+    if (this.formContatoGrupos.invalid) {
+      Swal.fire(
+        'Verifique!',
+        'Existe campo obrigatórios não preenchidos.',
+        'warning'
+      );
+      return;
+    }
+
+    this.loadingInlineSalvar = true;
+
+    if (idContato == 0) {
+      (await this.contatosServ.fnInsertContato(objContato)).subscribe(
+        (resp: any) => {
+          if (this.listGruposContato.length > 0) {
+            this.fnSalvaGrupoContato(resp.id);
+          }
+
+          this.loadingInlineSalvar = false;
+          Swal.fire(
+            'Sucesso!',
+            `Contato: ${objContato.dsContato} salvo.`,
+            'success'
+          );
+
+          this.fnGetContatos();
+          this.fnResetFormContato();
+        },
+        (err) => {
+          Swal.fire('Ops!', 'Não foi possível salvar contato.', 'error');
+        }
+      );
+    } else {
+      (
+        await this.contatosServ.fnEditarContato(objContato, idContato)
+      ).subscribe(
+        (resp: any) => {
+          if (this.listGruposContato.length > 0) {
+            this.fnSalvaGrupoContato(idContato);
+          }
+
+          if (this.listGrupoContatoDeletado.length > 0) {
+            this.fnDeletaGrupoDoContato();
+          }
+
+          Swal.fire(
+            'Sucesso!',
+            `Contato: ${objContato.dsContato} editado.`,
+            'success'
+          );
+          this.loadingInlineSalvar = false;
+          this.fnGetContatos();
+          this.fnResetFormContato();
+        },
+        (err) => {
+          Swal.fire('Ops!', 'Não foi possível editar contato.', 'error');
+        }
+      );
+    }
+  }
+
+  async fnSalvaGrupoContato(idContato: number) {
+    await this.listGruposContato.filter(async (fi: any) => {
+      let obj: any = {
+        contatoId: idContato,
+        grupocontatoId: fi.grupocontato_id,
+      };
+
+      if (fi.id == undefined) {
+        (await this.contatosServ.fnInsertContatoGrupo(obj)).subscribe(
+          (resp: any) => {}
+        );
+      } else {
+        (await this.contatosServ.fnEditaContatoGrupo(obj, fi.id)).subscribe(
+          (resp: any) => {}
+        );
+      }
+    });
+  }
+
+  async fnDeletaGrupoDoContato() {
+    await this.listGrupoContatoDeletado.filter(async (fi: any) => {
+      (await this.contatosServ.fnDeletaContatoGrupo(fi.id)).subscribe(
+        (resp: any) => {}
+      );
+    });
   }
 }

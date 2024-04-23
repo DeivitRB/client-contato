@@ -9,7 +9,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { contatosComponent } from './contatos-component/contatos-component';
 import { statusPipe } from './status.pipe';
 import { LoadingInlineModule } from '../loading-inline/loading-inline.module';
-
+import { NgxMaskModule } from 'ngx-mask';
 
 @NgModule({
   declarations: [contatosComponent, statusPipe],
@@ -22,7 +22,8 @@ import { LoadingInlineModule } from '../loading-inline/loading-inline.module';
     HttpClientModule,
     ReactiveFormsModule,
     NgbModule,
-    LoadingInlineModule
+    LoadingInlineModule,
+    NgxMaskModule.forRoot(),
   ],
   providers: [],
 })

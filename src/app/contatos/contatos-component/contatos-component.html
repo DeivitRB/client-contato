@@ -147,7 +147,9 @@
               <td>{{item.id}}</td>
               <td>{{item.ds_contato}}</td>
               <td>{{item.ds_email}}</td>
-              <td>{{item.nr_celular}}</td>
+              <td>
+                <span>{{item.nr_celular | mask: '(00) 00000-0000'}}</span>
+              </td>
               <td>
                 <span
                   [ngClass]="{'status-ativo': item.st_ativo == true, 'status-inativo': item.st_ativo == false}"
@@ -164,8 +166,13 @@
                   data-bs-toggle="modal"
                   data-bs-target="#modalContatosEGrupo"
                 >
-                  <fa-icon [icon]="faFilter" size="sm"></fa-icon>
+                  <fa-icon [icon]="faList" size="sm"></fa-icon>
                 </button>
+              </td>
+            </tr>
+            <tr *ngIf="listContatos.lenght <= 0">
+              <td class="text-center" colspan="6">
+                <span class="text-secondary">Nenhum contato encontrado!</span>
               </td>
             </tr>
           </tbody>
@@ -217,6 +224,7 @@
             <div class="col-md-6">
               <label>Nome Completo</label>
               <input
+                [ngClass]="{'input-invalid': formContatoGrupos.controls['iptNomeContato'].invalid}"
                 formControlName="iptNomeContato"
                 class="form-control form-control-sm"
                 type="text"
@@ -225,6 +233,7 @@
             <div class="col-md-3">
               <label>E-mail</label>
               <input
+                [ngClass]="{'input-invalid': formContatoGrupos.controls['iptEmailContato'].invalid}"
                 formControlName="iptEmailContato"
                 class="form-control form-control-sm"
                 type="email"
@@ -233,8 +242,10 @@
             <div class="col-md-3">
               <label>Celular</label>
               <input
+                [ngClass]="{'input-invalid': formContatoGrupos.controls['iptCelularContato'].invalid}"
                 formControlName="iptCelularContato"
                 class="form-control form-control-sm"
+                mask="(00) 00000-0000"
                 type="text"
               />
             </div>
@@ -261,6 +272,7 @@
                   *ngIf="item.showGrupo == true"
                   class="grupos"
                   (click)="fnInserirGrupoContato(item, i)"
+                  title="Incluir grupo para contato."
                 >
                   <span>{{item.dsGrupocontato}}</span>
                   <fa-icon
@@ -275,23 +287,39 @@
               class="justify-content-center align-self-center"
               style="padding: 0px 8px 0px 8px"
             >
-              <button type="button" class="btn btn-sm btn-success">
+              <button
+                type="button"
+                class="btn btn-sm btn-success"
+                (click)="fnInserirTodos()"
+                title="Inserir todos os grupos para o contato."
+              >
                 <fa-icon [icon]="faAnglesRight"></fa-icon>
               </button>
               <br />
-              <button type="button" class="btn btn-sm btn-success mt-3">
+              <button
+                type="button"
+                class="btn btn-sm btn-success mt-3"
+                title="Retirar todos os grupos do contato."
+                (click)="fnRetirarTodosGrupos()"
+              >
                 <fa-icon [icon]="faAnglesLeft"></fa-icon>
               </button>
             </div>
             <div class="div-limit-grupos">
-              <div></div>
               <div
                 *ngFor="let item of listGruposContato; let i = index"
                 class="grupos"
+                title="Retirar grupo do contato."
                 (click)="fnRetirarGrupodeContato(item, i)"
               >
                 <fa-icon [icon]="faChevronLeft" size="sm"></fa-icon>
                 <span style="float: right">{{item.ds_grupocontato}}</span>
+              </div>
+
+              <div *ngIf="listGruposContato.length <= 0">
+                <span class="text-center text-secondary"
+                  >Contato não está em nenhum grupo!</span
+                >
               </div>
             </div>
           </div>
@@ -299,14 +327,22 @@
       </div>
       <div class="modal-footer">
         <button
+          *ngIf="!loadingInlineSalvar"
           type="button"
           class="btn btn-sm btn-outline-success"
-          data-bs-dismiss="modal"
+          (click)="fnSalvaContato()"
         >
           <fa-icon [icon]="faPlus"></fa-icon>
           Criar
         </button>
+
+        <app-loading-inline
+          *ngIf="loadingInlineSalvar"
+          msgLoading="Enviando dados do contato e grupos, aguarde..."
+        ></app-loading-inline>
       </div>
     </div>
   </div>
 </div>
+
+<!-- data-bs-dismiss="modal"-->

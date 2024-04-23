@@ -98,3 +98,7 @@ table th:hover {
   display: inline-flex;
   width: 100%;
 }
+
+.input-invalid {
+  border-left: 2px solid #c92222;
+}
