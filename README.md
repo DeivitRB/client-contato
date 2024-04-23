@@ -1,27 +1,33 @@
-# Contatos
+# client-contato
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.2.4.
+Projeto destinado ao teste da Lusati Tecnologia. Tem o objetivo gerenciamento de contatos e grupos.
+Proposta: Uma empresa precisa de uma ferramenta para controlar o envio de mensagens por WhatsApp.
+Durante o processo de levantamento de requisitos foi possível observar que os elementos principais
+dessa aplicação são Contatos e Grupo.
 
-## Development server
+## Tecnologia utilizada
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- Angular 11
+- Bootstrap
+- fontawesome
+- ng-Bootstrap
+- ngx-mask
+- sweetalert2
 
-## Code scaffolding
+## Comandos
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Instalar bibliotecas
 
-## Build
+```bash
+  npm install or yarn install
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Rodar em desenvolvimento comandos **package.json**:
 
-## Running unit tests
+```bash
+  npm run start or yarn start
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Autores
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- [@DeivitRB](https://github.com/DeivitRB)
