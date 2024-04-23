@@ -1,0 +1,80 @@
+
+.header-page {
+    padding: 10px 15px 10px 15px;
+    border: 0.5px solid #eeeeee;
+    border-radius: 5px;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin-top: 15px;
+}
+
+.card {
+    text-align: center;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 5px;
+    border: none;
+}
+
+.card-ativos {
+    background-color: #22c930;
+    color: #fff;
+}
+
+.card-inativos {
+    background-color: #c92222;
+    color: #fff;
+}
+
+.span-status {
+    padding: 5px 10px 5px 10px;
+    border-radius: 5px;
+    display: block;
+    width: 100%;
+}
+
+.status-ativo {
+    background-color: #22c93085;
+    color: #088513;
+}
+
+.status-inativo {
+    background-color: #c922226b;
+    color: #c92222;
+}
+
+table th {
+    cursor: pointer;
+}
+
+table th:hover {
+    background-color: #ececec;
+}
+
+.modal-header {
+    border: none;
+}
+
+.modal-footer {
+    border: none;
+}
+
+.opcoes-menu {
+    width: 100%;
+    border-bottom: 0.5px solid #eeeeee;
+    padding: 10px 8px 10px 8px;
+}
+
+.opcoes-menu span {
+    padding: 0px 10px 0px 10px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.opcoes-menu span:hover {
+    color: #1f35f7;
+}
+
+.menu-ativo {
+    color: #1f35f7;
+}
